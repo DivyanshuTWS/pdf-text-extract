@@ -75,11 +75,16 @@ for file in files:
     llm_response = text_to_llm(output_data= all_texts)
     
     
+    # method 2:
+    # send into azure open ai
+    # skip for now
+    
+    
+    
+    
     rows.append(
         {"file_path": str(file.absolute()),"file_name": file.name, "text": all_texts, "llm_text":llm_response.choices[0].message.content}
     )
-    # method 2:
-    # send into azure open ai
 
 df = pd.DataFrame(rows)
 df.to_csv("output/pocresult.csv", index=False, encoding='utf-8')

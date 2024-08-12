@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import openai
 from openai.types.chat import ChatCompletion
 from dotenv import load_dotenv
@@ -57,5 +58,40 @@ def text_to_llm(output_data: str) -> ChatCompletion:
     )
     # logger.info("Prompt tokens: %s, Completion tokens: %s, Total tokens: %s", response.usage.prompt_tokens, response.usage.completion_tokens, response.usage.total_tokens)
     # Print the response from the API
+    # print(response.choices[0].message.content) 
+    return response
+
+
+
+def img_to_llm(img:np.ndarray, question: str) -> ChatCompletion:
+    """
+    Send text into LLM (GPT4o)
+    
+    Returns:
+    ChatCompletion: The response from OpenAI containing the extracted info
+    """
+   
+    # Define the prompt
+    prompt = [
+        {"role":"system",
+        "content": [
+			{
+				"type": "text",
+				"text": "You are an AI assistant that helps people find information."
+			}
+		],
+        },
+        {"role":"user",
+         "content": question #Please give me the tag number and manufacturer.  Return the values without explanation.
+         }
+        ]
+
+
+    response = openai.chat.completions.create(
+        model=deployment_name,
+        temperature=0,
+        messages=prompt,
+    )
+    # response from the API
     # print(response.choices[0].message.content) 
     return response
