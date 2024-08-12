@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image
 from dotenv import load_dotenv
 
-from utils.ocr import get_azure_object, get_word_properties_from_azure_json
+from utils.ocr import draw_text_boxes_on_img, get_azure_object, get_word_properties_from_azure_json
 import pandas as pd
 
 
@@ -48,8 +48,7 @@ print("Program started at " + start_time)
 
 img_source_path = config.get('img_source_path',[])
 extensions = config.get("extensions", ('pdf', 'png', 'jpg'))
-
-
+save_img = config.get("save_img", False)
 file_manager = FileManager(source_file_path=img_source_path, )
 files = file_manager.generate_files(extensions=extensions)
 
@@ -61,8 +60,15 @@ for file in files:
     # method 1: 
     # send into ocr
     # post-process ocr output
+    # send text to ocr
     ocr_result = get_azure_object(image = img, file_name=file.name, config= config, save_to_file=True)
     word_properties = get_word_properties_from_azure_json(ocr_result)
+    if save_img:
+        output_img = draw_text_boxes_on_img(image = img, word_properties = word_properties)
+        img_save_path = "output\image\ocr"
+        os.makedirs(img_save_path, exist_ok=True)
+        cv2.imwrite(os.path.join(img_save_path, f'{file.stem}_ocr.png'), output_img)
+    
     all_texts = " ".join([word['word_cluster'] for word in word_properties])
     rows.append(
         {"file_path": str(file.absolute()),"file_name": file.name, "text": all_texts}
@@ -73,4 +79,4 @@ for file in files:
     # send into azure open ai
 
 df = pd.DataFrame(rows)
-df.to_csv("pocresult.csv", index=False, encoding='utf-8')
+df.to_csv("output/pocresult.csv", index=False, encoding='utf-8')

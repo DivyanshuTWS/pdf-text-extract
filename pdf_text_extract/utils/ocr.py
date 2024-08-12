@@ -4,6 +4,7 @@ import logging
 import os
 import time
 from typing import Dict
+import cv2
 import numpy as np
 import requests
 from PIL import Image
@@ -140,3 +141,38 @@ def get_word_properties_from_azure_json(json_object) -> list[dict]:
                     # logger.debug("CR: %s S: %s -> %s", ratio, line['boundingBox'], cluster_detail['word_cluster_box'])
                     word_boxes.append(cluster_detail)
     return word_boxes
+
+
+def draw_text_boxes_on_img(image: np.ndarray, word_properties: list[dict]):
+    """
+    Draw text boxes on an image from OCR results.
+
+    This function takes in an image and word properties from OCR results, 
+    and draws the bounding boxes and text onto the image.
+
+    Parameters
+    -------
+    - `image` (np.ndarray): The input image
+    - `word_properties` (list of dicts): A list of dictionaries containing 
+        word properties like bounding boxes and text from the OCR results
+
+    Returns
+    -------
+        np.ndarray: The image with text boxes drawn on it
+    """
+    markup_image = image.copy() # <TODO> change it to cope with different image formats
+    if markup_image is not None:
+        ploylines = [word['boundingBox'] for d in word_properties for word in d['words']] # select all bounding boxes
+        text_list = [word['text'] for d in word_properties for word in d['words']] # select all texts
+        contours = np.array(ploylines, dtype=np.int32)
+        cv2.drawContours(image=markup_image, contours=contours, contourIdx=-1, color=(0,0,255), thickness=1) #  markup_image = draw_polygons(markup_image, contours, (0, 255, 0))
+
+        for tidx, (text_val, contour) in enumerate(zip(text_list, contours)):
+            M = cv2.moments(contour)
+            cx = int(M['m10']/M['m00'])
+            cy = int(M['m01']/M['m00'])
+            cv2.putText(markup_image, str(tidx), org= (cx,cy), fontScale=1, color=(255, 0, 0), thickness=1, fontFace=cv2.FONT_HERSHEY_SIMPLEX)
+            # logger.debug("Idx: %s Text: %s Contour: %s ", tidx, text_val, contour)
+
+        # data['images']['markup'] = markup_image
+    return markup_image
