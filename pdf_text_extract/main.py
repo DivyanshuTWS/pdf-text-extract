@@ -4,11 +4,14 @@ from pathlib import Path
 import time
 import os
 import json
-# import fitz <TODO> fix import error
+import fitz
 import cv2
 import numpy as np
 from PIL import Image
 from dotenv import load_dotenv
+
+from utils.ocr import get_azure_object, get_word_properties_from_azure_json
+import pandas as pd
 
 
 load_dotenv()
@@ -49,23 +52,25 @@ extensions = config.get("extensions", ('pdf', 'png', 'jpg'))
 
 file_manager = FileManager(source_file_path=img_source_path, )
 files = file_manager.generate_files(extensions=extensions)
+
+rows = []
 for file in files:
     print(file)
-    # if file.suffix == ".pdf":
-    #     doc = fitz.open(file)
-    #     for page in doc:
-    #         pix = page.get_pixmap()
-    #         img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-    #         img.save(file.stem + ".png")
-    # elif file.suffix == ".png" or file.suffix == ".jpg":
-    #     img = cv2.imread(str(file))
-    #     cv2.imwrite(file.stem + ".png", img)
-    
+    img = cv2.imread(str(file))
+   
     # method 1: 
     # send into ocr
     # post-process ocr output
+    ocr_result = get_azure_object(image = img, file_name=file.name, config= config, save_to_file=True)
+    word_properties = get_word_properties_from_azure_json(ocr_result)
+    all_texts = " ".join([word['word_cluster'] for word in word_properties])
+    rows.append(
+        {"file_path": str(file.absolute()),"file_name": file.name, "text": all_texts}
+    )
     
     
     # method 2:
     # send into azure open ai
-    
+
+df = pd.DataFrame(rows)
+df.to_csv("pocresult.csv", index=False, encoding='utf-8')
