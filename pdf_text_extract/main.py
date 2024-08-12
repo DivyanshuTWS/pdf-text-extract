@@ -1,15 +1,16 @@
-import io
+# import io
 from itertools import chain
 from pathlib import Path
 import time
 import os
 import json
-import fitz
+# import fitz
 import cv2
-import numpy as np
-from PIL import Image
+# import numpy as np
+# from PIL import Image
 from dotenv import load_dotenv
 
+from utils.llm import text_to_llm
 from utils.ocr import draw_text_boxes_on_img, get_azure_object, get_word_properties_from_azure_json
 import pandas as pd
 
@@ -70,11 +71,13 @@ for file in files:
         cv2.imwrite(os.path.join(img_save_path, f'{file.stem}_ocr.png'), output_img)
     
     all_texts = " ".join([word['word_cluster'] for word in word_properties])
+    
+    llm_response = text_to_llm(output_data= all_texts)
+    
+    
     rows.append(
-        {"file_path": str(file.absolute()),"file_name": file.name, "text": all_texts}
+        {"file_path": str(file.absolute()),"file_name": file.name, "text": all_texts, "llm_text":llm_response.choices[0].message.content}
     )
-    
-    
     # method 2:
     # send into azure open ai
 
