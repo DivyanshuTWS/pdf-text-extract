@@ -1,0 +1,7 @@
+{
+    "img_source_path": [
+        "pdftopng"
+    ],
+    "save_path": "output",
+    "save_img":true
+}
