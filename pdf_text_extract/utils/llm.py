@@ -25,7 +25,7 @@ def text_to_llm(output_data: str) -> ChatCompletion:
     prompt = [
         {"role":"system",
          "content":"""
-                I have done OCR and got the results as below. Please give me the Latest date or updated date. 
+                I have done OCR and got the results as below. Please give me the Title , Description , Equipment Number , Data issued , Client, Project , Pump Number , Unit and Location . 
                 Return the values without explanation.
             """
             },
