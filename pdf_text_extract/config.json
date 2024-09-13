@@ -1,6 +1,6 @@
 {
     "img_source_path": [
-        "box10"
+        "input"
     ],
     "save_path": "output",
     "save_img":true

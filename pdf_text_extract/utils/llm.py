@@ -25,8 +25,11 @@ def text_to_llm(output_data: str) -> ChatCompletion:
     prompt = [
         {"role":"system",
          "content":"""
-                I have done OCR and got the results as below. Please give me the Title , Description , Equipment Number , Data issued , Client, Project , Pump Number , Unit and Location . 
-                Return the values without explanation.
+            The drawing contains various component or section such as "Detail of operating Plate form", "U/S elevation of shutter","section elevation at A-A","section elevation at B-B","Details at D-D" , "Details at X","Details of groove". 
+            Each of the section or component has their own specifications like height and width also they are having number of equipments like various type of bolts, seals , clamps,plate, stiffner and screw.
+            so please give me details of each component that i mentioned along with their dimensions and number of each equipments used  .
+            Note that the component name is written below the related diagram so kindly give me related data above the section or component name,also  give me desgined by , submitted by , drawn by , checked by , recommended by ,Traced by, accepted by .
+            Return the values without explanation .
             """
             },
         # {"role":"user",
@@ -77,7 +80,7 @@ def img_to_llm(img:np.ndarray, question: str) -> ChatCompletion:
         "content": [
 			{
 				"type": "text",
-				"text": "You are an AI assistant that helps people find information."
+				"text": "You are an Engineering Expert who is excellent in reading engineering drawings that helps people find detailed information."
 			}
 		],
         },
