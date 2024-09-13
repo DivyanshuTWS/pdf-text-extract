@@ -37,11 +37,22 @@ def extract_metadata_from_image(image_path, prompt):
         image = image_file.read()
 
     # Send the request to OpenAI's API using the new API format for version >=1.0.0
-    response = openai.completions.create(
+    response = openai.Completion.create(
         model=model_name,  # Use your specific model name here
         messages=[
             {"role": "system", "content": "You are an assistant skilled in extracting metadata from engineering drawings."},
-            {"role": "user", "content": prompt}
+            {"role": "user", "content":"""
+The drawing contains various component or section such as "Detail of operating Plate form", 
+"U/S elevation of shutter", "section elevation at A-A", "section elevation at B-B", "Details at D-D", 
+"Details at X", "Details of groove". Each of the section or component has their own specifications like height 
+and width, also they are having number of equipments like various type of bolts, seals, clamps, plates, 
+stiffeners, and screws. 
+
+Please provide details of each component that I mentioned along with their dimensions and the number of each 
+equipment used. Note that the component name is written below the related diagram, so kindly give me related 
+data above the section or component name. Also, provide 'designed by', 'submitted by', 'drawn by', 'checked by', 
+'recommended by', 'traced by', and 'accepted by'. Return the values without explanation.
+"""}
         ],
         temperature=0,
         max_tokens=2000
