@@ -25,10 +25,8 @@ def text_to_llm(output_data: str) -> ChatCompletion:
     prompt = [
         {"role":"system",
          "content":"""
-            The drawing contains various component or section such as "Detail of operating Plate form", "U/S elevation of shutter","section elevation at A-A","section elevation at B-B","Details at D-D" , "Details at X","Details of groove". 
-            Each of the section or component has their own specifications like height and width also they are having number of equipments like various type of bolts, seals , clamps,plate, stiffner and screw.
-            so please give me details of each component that i mentioned along with their dimensions and number of each equipments used  .
-            Note that the component name is written below the related diagram so kindly give me related data above the section or component name,also  give me desgined by , submitted by , drawn by , checked by , recommended by ,Traced by, accepted by .
+            I have Done OCR of the images and now i need you to give me the all the related metadata which is present in the image
+            But dont give the numbers which are creating any noise in the data means numbers which dont make any sense try to avoid them Also give me title of the drawing
             Return the values without explanation .
             """
             },
